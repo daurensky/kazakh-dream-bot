@@ -19,6 +19,7 @@ var messages = map[string]string{
 	"order_details_created": "Данные о доставке созданы, можно продолжить заказывать",
 	"order_created":         "Заказ создан. Посмотреть заказы можно с помощью /orders",
 	"cart_empty":            "Корзина пуста. Пора её наполнить /menu",
+	"orders_empty":          "Вы пока ничего не заказывали",
 }
 
 func main() {
@@ -172,13 +173,15 @@ func main() {
 					panic(err)
 				}
 
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, messages["cart_empty"])
+
 				client, err := db.ShowClient(update.Message.From.ID)
 
-				if err != nil {
+				if err == sql.ErrNoRows {
+					msg.Text = messages["orders_empty"]
+				} else if err != nil {
 					panic(err)
 				}
-
-				msg := tgbotapi.NewMessage(update.Message.Chat.ID, messages["cart_empty"])
 
 				if len(orders) != 0 {
 					var rows []string
