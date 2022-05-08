@@ -18,7 +18,7 @@ func GetClientOrders(telegramId int64) ([]models.Order, error) {
 		SELECT *
 		FROM kazakh_dream.public.orders
 		WHERE client_id = $1
-		ORDER BY created_at DESC
+		ORDER BY created_at DESC LIMIT 5
 	`, telegramId)
 
 	for ordersFromDB.Next() {

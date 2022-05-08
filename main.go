@@ -102,7 +102,7 @@ func main() {
 						tgbotapi.NewInlineKeyboardRow(
 							tgbotapi.NewInlineKeyboardButtonData(
 								"Создать заказ",
-								"to_order:"+strconv.Itoa(int(update.Message.From.ID)),
+								"do_order:"+strconv.Itoa(int(update.Message.From.ID)),
 							),
 						),
 					)
@@ -144,7 +144,7 @@ func main() {
 								tgbotapi.NewInlineKeyboardRow(
 									tgbotapi.NewInlineKeyboardButtonData(
 										"Создать заказ",
-										"to_order:"+strconv.Itoa(int(update.Message.From.ID)),
+										"do_order:"+strconv.Itoa(int(update.Message.From.ID)),
 									),
 								),
 							)
@@ -197,7 +197,7 @@ func main() {
 						}
 
 						rows = append(rows, fmt.Sprintf(
-							"%s: *%s*. %s, %s, %s, %s",
+							"_%s_: *%s*. %s, %s, %s, %s",
 							order.StatusText(),
 							strings.Join(composition, ", "),
 							client.Name,
@@ -251,7 +251,7 @@ func main() {
 				if _, err := bot.Request(callback); err != nil {
 					panic(err)
 				}
-			case "to_order":
+			case "do_order":
 				var text string
 
 				client, err := db.ShowClient(update.CallbackQuery.From.ID)
@@ -261,7 +261,7 @@ func main() {
 				} else if err == nil {
 					products, err := db.GetClientProducts(client.TelegramId, true)
 
-					if err == sql.ErrNoRows {
+					if len(products) == 0 {
 						text = messages["cart_empty"]
 					} else if err == nil {
 						orderId, err := db.StoreOrder(client)
