@@ -167,51 +167,50 @@ func main() {
 					panic(err)
 				}
 			case "orders":
-				orders, err := db.GetClientOrders(update.Message.From.ID)
-
-				if err != nil {
-					panic(err)
-				}
-
-				msg := tgbotapi.NewMessage(update.Message.Chat.ID, messages["cart_empty"])
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, messages["orders_empty"])
 
 				client, err := db.ShowClient(update.Message.From.ID)
 
-				if err == sql.ErrNoRows {
-					msg.Text = messages["orders_empty"]
-				} else if err != nil {
-					panic(err)
-				}
+				if err == nil {
 
-				if len(orders) != 0 {
-					var rows []string
+					orders, err := db.GetClientOrders(update.Message.From.ID)
 
-					for _, order := range orders {
-						var composition []string
-
-						for _, product := range order.Products {
-							composition = append(composition, product.Name)
-						}
-
-						createdAt, err := order.CreatedAtText()
-
-						if err != nil {
-							panic(err)
-						}
-
-						rows = append(rows, fmt.Sprintf(
-							"_%s_: *%s*. %s, %s, %s, %s",
-							order.StatusText(),
-							strings.Join(composition, ", "),
-							client.Name,
-							client.Phone,
-							client.Address,
-							createdAt,
-						))
+					if err != nil {
+						panic(err)
 					}
 
-					msg.Text = strings.Join(rows, "\n")
-					msg.ParseMode = "markdown"
+					if len(orders) != 0 {
+						var rows []string
+
+						for _, order := range orders {
+							var composition []string
+
+							for _, product := range order.Products {
+								composition = append(composition, product.Name)
+							}
+
+							createdAt, err := order.CreatedAtText()
+
+							if err != nil {
+								panic(err)
+							}
+
+							rows = append(rows, fmt.Sprintf(
+								"_%s_: *%s*. %s, %s, %s, %s",
+								order.StatusText(),
+								strings.Join(composition, ", "),
+								client.Name,
+								client.Phone,
+								client.Address,
+								createdAt,
+							))
+						}
+
+						msg.Text = strings.Join(rows, "\n")
+						msg.ParseMode = "markdown"
+					}
+				} else if err != nil && err != sql.ErrNoRows {
+					panic(err)
 				}
 
 				if _, err := bot.Send(msg); err != nil {
