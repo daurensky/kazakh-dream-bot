@@ -44,6 +44,10 @@ func GetClientOrders(telegramId int64) ([]models.Order, error) {
 			GROUP BY p.id
 		`, order.Id)
 
+		if err != nil {
+			panic(err)
+		}
+
 		for orderProductsFromDB.Next() {
 			product := models.Product{}
 
