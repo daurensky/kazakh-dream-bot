@@ -35,12 +35,6 @@ func main() {
 		panic(err)
 	}
 
-	bot.Debug = true
-
-	if err != nil {
-		panic(err)
-	}
-
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
