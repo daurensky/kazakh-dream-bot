@@ -14,7 +14,14 @@ func GetProducts() ([]models.Product, error) {
 		return nil, err
 	}
 
-	productsFromDB, err := db.Query("SELECT * FROM kazakh_dream.public.products")
+	productsFromDB, err := db.Query(`
+		SELECT id,
+			   price,
+			   photo_url,
+			   composition,
+			   name
+		FROM kazakh_dream.public.products
+	`)
 
 	for productsFromDB.Next() {
 		product := models.Product{}

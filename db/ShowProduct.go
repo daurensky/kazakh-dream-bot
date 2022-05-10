@@ -14,7 +14,15 @@ func ShowProduct(productId int) (models.Product, error) {
 		return product, err
 	}
 
-	row := db.QueryRow("SELECT * FROM kazakh_dream.public.products WHERE id = $1", productId)
+	row := db.QueryRow(`
+		SELECT id,
+			   price,
+			   photo_url,
+			   composition,
+			   name
+		FROM kazakh_dream.public.products
+		WHERE id = $1
+	`, productId)
 
 	err = row.Scan(&product.Id, &product.Price, &product.PhotoUrl, pq.Array(&product.Composition), &product.Name)
 

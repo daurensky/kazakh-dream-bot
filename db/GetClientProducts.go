@@ -17,7 +17,11 @@ func GetClientProducts(telegramId int64, withDuplicates bool) ([]models.Product,
 
 	if withDuplicates {
 		sql = `
-			SELECT p.*
+			SELECT p.id,
+				   p.price,
+				   p.photo_url,
+				   p.composition,
+			       p.name
 			FROM kazakh_dream.public.cart c
 				INNER JOIN kazakh_dream.public.products p on p.id = c.product_id
 			WHERE c.telegram_id = $1
@@ -25,7 +29,7 @@ func GetClientProducts(telegramId int64, withDuplicates bool) ([]models.Product,
 	} else {
 		sql = `
 			SELECT p.id,
-				   p.price,
+			   	   SUM(p.price),
 				   p.photo_url,
 				   p.composition,
 				   CASE WHEN COUNT(p.id) > 1 THEN CONCAT(p.name, ' ', COUNT(p.id), ' шт.') ELSE p.name END AS name
